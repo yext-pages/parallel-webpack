@@ -134,7 +134,14 @@ module.exports = function(configuratorFileName, options, index, expectedConfigLe
                 }
                 if(!watch) {
                     process.removeListener('SIGINT', shutdownCallback);
-                    done(null, options.stats ? JSON.stringify(stats.toJson(outputOptions), null, 2) : '');
+                    for(let plugin of stats.compilation.compiler.options.plugins) {
+                        if(plugin.name === 'PagesBuilder'){
+                            let obj = {};
+                            obj.assets = plugin.assets;
+                            obj.manifest = plugin.manifest;
+                            done(null, JSON.stringify(obj));
+                        }
+                    }
                 } else if (!hasCompletedOneCompile) {
                     notifyIPCWatchCompileDone(index);
                     hasCompletedOneCompile = true;
